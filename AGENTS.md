@@ -4,7 +4,7 @@
 - Preserve the approved illustrations and stable variant slugs. Keep the full source in `reference/` and web assets in `public/garments/`.
 - Keep product facts grounded in approved sources. Gate bag actions on approved catalogue data. Gate payment and order creation on approved server workflows.
 - Use strict TypeScript, server components by default, accessible native controls and shared design tokens.
-- Run `npm run lint`, `npm run typecheck`, `npm test`, `npm run build` and `npm run test:e2e` before reporting completion.
+- Run `npm run lint`, `npm run typecheck`, `npm test`, `npm run test:db`, `npm run build` and `npm run test:e2e` before reporting completion.
 - Keep credentials in untracked local configuration. Deployment and live payments require approval.
 
 <!-- BEGIN:nextjs-agent-rules -->

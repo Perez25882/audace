@@ -12,7 +12,7 @@ export function isPesewas(value: unknown): value is number {
 
 const wholeNumber = new Intl.NumberFormat("en-GH", { maximumFractionDigits: 0 });
 
-export function formatGhs(pesewas: number) {
+export function formatGhs(pesewas: number | bigint) {
   const amount = BigInt(pesewas);
   return `GHS ${wholeNumber.format(amount / BigInt(100))}.${String(amount % BigInt(100)).padStart(2, "0")}`;
 }

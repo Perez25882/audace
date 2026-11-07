@@ -1,54 +1,50 @@
 # AUDACE
 
-AUDACE is a local menswear storefront for the first release. Phase 2 adds garment zoom, size and quantity selection, a persistent bag, and guest checkout review to the Phase 1 collection.
+AUDACE is a Ghanaian menswear storefront and private store operations console. The first release comprises seven approved garment illustrations from the supplied PDF.
 
 ## Local development
 
-Use Node.js 20.9 or newer and npm. From this folder, run:
+Use Node.js 22 or newer and npm. From this folder, run:
 
 ```powershell
 npm ci
 npm run dev
 ```
 
-Open [the local storefront](http://localhost:3000). The storefront runs without credentials. See [.env.example](.env.example) for reserved configuration names.
+Open [the local storefront](http://127.0.0.1:3000). With the Supabase settings blank, the app serves the illustrated collection with ordering unavailable.
+
+For local administration and database-backed commerce, install the Supabase CLI and a compatible container runtime. From the project folder:
+
+```powershell
+supabase start
+supabase migration up --local
+supabase status
+```
+
+Copy `.env.example` to `.env.local`. Set the API URL and publishable key from the local project's status output, set the app origin, and restart Next.js. For a hosted environment, use your project's API settings and actual HTTPS app origin. See the [Phase 3 operations guide](docs/phase-3.md) for initial administrator provisioning and the reservation lifecycle.
+
+## Checks
 
 ```powershell
 npm run lint
 npm run typecheck
 npm test
+npm run test:db
 npm run build
 npm run test:e2e
-npm start
 ```
 
-Browser tests require a locally installed Chrome. They launch the production build and a temporary, independent build with clearly labelled test data. `npm start` serves the normal production build on port 3000.
+The database and browser suites use disposable local PostgreSQL clusters. Install PostgreSQL 17 client and server binaries and put them on PATH, or set `AUDACE_PG_BIN` to the bin directory. Browser tests also require Chrome. Run the production build before the browser suite.
 
 ## Routes
 
 | Route | Behavior |
 | --- | --- |
-| `/` | Editorial homepage and sleeve-filtered collection at `#collection` |
-| `/products/[slug]` | Prerendered garment detail, image gallery and approved colour and sleeve navigation |
-| `/bag` | Persistent, editable bag with stock checks and integer-pesewa subtotals |
-| `/checkout` | Guest delivery form, validation and order summary. Review depends on configured stock, prices and delivery |
-| `/order-confirmation` | Empty order state |
-| Unknown or unpublished variant | HTTP 404 with a link back to the collection |
+| `/`, `/products/[slug]` | Database-backed collection and garment details, with an illustrations-only mode when Supabase is unconfigured |
+| `/bag` | Browser-persisted bag, repriced from the current catalogue |
+| `/checkout` | Guest validation and database quote. Review ends before order placement |
+| `/order-confirmation` | Empty confirmation state |
+| `/admin/login` | Private staff sign-in |
+| `/admin` | Overview, catalogue, inventory, orders and delivery operations |
 
-## Merchant configuration
-
-Use [src/lib/merchant-config.ts](src/lib/merchant-config.ts) for merchant-approved prices in pesewas, size labels and per-size stock, publish state, specifications, size guidance, and delivery options. Use the existing public variant slugs as keys. The shipped configuration is empty. Missing prices, sizes or stock disable adding the affected item to the bag. Delivery methods need explicit region coverage and fees. Rebuild the production site after updating this file.
-
-## Implementation
-
-Next.js App Router prerenders the collection and product routes from the server catalogue. Only interactive controls and shopping views use client components. The bag stores variant IDs, size labels and quantities in browser local storage. Prices and stock come from the catalogue in the current build. Shared bag and checkout functions validate quantities and compute estimates in integer pesewas. Checkout details stay on the form in the current page.
-
-Tailwind v4 exposes shared tokens alongside component styles in `src/app/globals.css`. Local fonts and responsive derivatives of the PDF rasters serve the storefront. The zoom dialog uses the original WebP.
-
-- [Garment asset inventory](docs/assets.md)
-- [Design system](docs/design-system.md)
-- [Phase 1 completion](docs/phase-1.md)
-- [Phase 2 implementation and review](docs/phase-2.md)
-- [Project rules](AGENTS.md)
-
-The tooling follows the [Next.js App Router installation guide](https://nextjs.org/docs/app/getting-started/installation) and the [Tailwind CSS guide for Next.js](https://tailwindcss.com/docs/installation/framework-guides/nextjs).
+Phase 3 moves merchant configuration to the protected admin. The catalogue migration seeds the approved garments and leaves prices, size SKUs, stock and delivery methods awaiting merchant entry. The original artwork and variant slugs are recorded in the [asset inventory](docs/assets.md). UI tokens remain in the [design system](docs/design-system.md).

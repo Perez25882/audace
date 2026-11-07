@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=20.9.0"
+    "node": ">=22"
   },
   "scripts": {
     "dev": "next dev",
@@ -12,11 +12,14 @@
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "tsc -p tests/tsconfig.json && node --test work/test-build/tests/shop.test.js",
-    "test:e2e": "node --test tests/shop.browser.test.mjs"
+    "test:e2e": "node --test tests/shop.browser.test.mjs",
+    "test:db": "node --test tests/database.test.mjs"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "5.3.0",
     "@fontsource-variable/newsreader": "5.3.0",
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.114.0",
     "next": "16.4.5",
     "react": "19.3.1",
     "react-dom": "19.3.1"

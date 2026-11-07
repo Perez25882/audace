@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { BagView } from "@/components/bag-view";
-import { variants } from "@/lib/catalogue";
+import { getShop } from "@/lib/server/shop";
 
 export const metadata: Metadata = { title: "Bag", robots: { index: false } };
+export const dynamic = "force-dynamic";
 
-export default function BagPage() {
-  return <BagView variants={variants} />;
+export default async function BagPage() {
+  const { variants, mode } = await getShop();
+  return <BagView variants={variants} serviceUnavailable={mode === "unavailable"} />;
 }

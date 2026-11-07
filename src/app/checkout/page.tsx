@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { CheckoutView } from "@/components/checkout-view";
-import { variants } from "@/lib/catalogue";
-import { merchant } from "@/lib/merchant-config";
+import { getShop } from "@/lib/server/shop";
 
 export const metadata: Metadata = { title: "Checkout", robots: { index: false } };
+export const dynamic = "force-dynamic";
 
-export default function CheckoutPage() {
-  return <CheckoutView variants={variants} methods={merchant.deliveryMethods} />;
+export default async function CheckoutPage() {
+  const { variants, methods, mode } = await getShop();
+  return <CheckoutView variants={variants} methods={methods} serviceUnavailable={mode === "unavailable"} />;
 }

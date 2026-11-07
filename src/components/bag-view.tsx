@@ -9,7 +9,7 @@ import { GarmentImage } from "./garment-image";
 import { Arrow } from "./icons";
 import { Quantity } from "./quantity";
 
-export function BagView({ variants }: { variants: readonly Variant[] }) {
+export function BagView({ variants, serviceUnavailable }: { variants: readonly Variant[]; serviceUnavailable: boolean }) {
   const { items, ready, persistent } = useBag();
   const heading = useRef<HTMLHeadingElement>(null);
   const quote = quoteBag(items, variants);
@@ -18,6 +18,7 @@ export function BagView({ variants }: { variants: readonly Variant[] }) {
     <section className="frame shop-page" aria-labelledby="bag-heading">
       <Link className="back-link" href="/#collection"><Arrow direction="left" /> Continue shopping</Link>
       <h1 className="shop-heading" id="bag-heading" ref={heading} tabIndex={-1}>Your bag</h1>
+      {serviceUnavailable && <p className="shop-notice" role="status">Product availability is temporarily unavailable. Your bag is saved for another visit.</p>}
       {!ready ? <p role="status">Loading your bag…</p> : items.length === 0 ? (
         <div className="shop-empty">
           <p>Your bag is empty.</p>

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { availability, decodeBag, formatGhs, quantityInBag, quoteBag, setBagQuantity, type BagItem } from "../src/lib/bag";
 import { checkoutQuote, normaliseGhanaPhone, validateCheckout, type CheckoutValues } from "../src/lib/checkout";
-import { merchant } from "../src/lib/merchant-config";
+import { parseCheckout, parseLines } from "../src/lib/checkout-input";
 import { selectColourVariant, type DeliveryMethod, type Variant } from "../src/lib/shop-model";
 
 // Fictional amounts and stock for isolated tests.
@@ -29,10 +29,13 @@ test("colour selection retains the sleeve when possible and uses the actual Whit
   assert.equal(selectColourVariant([first, long, white], "Burgundy", "Long sleeve"), undefined);
 });
 
-test("the supplied merchant configuration publishes no commercial values", () => {
-  assert.deepEqual(merchant.variants, {});
-  assert.deepEqual(merchant.deliveryMethods, []);
-  assert.equal(merchant.shippingReturns, null);
+test("server input rejects tampered lines and non-string contact fields", () => {
+  const valid = item(first, 1);
+  assert.deepEqual(parseLines([{ ...valid, pricePesewas: 1 }]), [valid]);
+  assert.equal(parseLines([valid, valid]), null);
+  assert.equal(parseLines([{ ...valid, quantity: 1.5 }]), null);
+  assert.equal(parseCheckout({ ...details, email: 2 }), null);
+  assert.deepEqual(parseCheckout({ ...details, name: " Sample Customer " }), details);
 });
 
 test("unconfirmed prices, sizes, stock and unpublished items cannot be added", () => {

@@ -4,20 +4,20 @@ import { notFound } from "next/navigation";
 import { ProductGallery } from "@/components/product-gallery";
 import { PurchaseOptions } from "@/components/purchase-options";
 import { Arrow } from "@/components/icons";
-import { colours, findVariant, variants } from "@/lib/catalogue";
-import { merchant } from "@/lib/merchant-config";
+import { colours } from "@/lib/catalogue";
+import { getShop } from "@/lib/server/shop";
+import { Status } from "@/components/status";
 import { selectColourVariant, type Colour } from "@/lib/shop-model";
 
 type ProductPageProps = { params: Promise<{ slug: string }> };
 
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return variants.map(({ slug }) => ({ slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
-  const variant = findVariant((await params).slug);
+  const { slug } = await params;
+  const { variants, mode } = await getShop();
+  const variant = variants.find((item) => item.slug === slug);
+  if (mode === "unavailable") return { title: "Collection temporarily unavailable", robots: { index: false } };
   if (!variant) notFound();
   return {
     title: `${variant.colour} ${variant.name.toLowerCase()} / ${variant.sleeve}`,
@@ -26,7 +26,10 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const variant = findVariant((await params).slug);
+  const { slug } = await params;
+  const { variants, mode, shippingReturns } = await getShop();
+  const variant = variants.find((item) => item.slug === slug);
+  if (mode === "unavailable") return <Status title="Collection temporarily unavailable." description="Try loading this garment again shortly." />;
   if (!variant) notFound();
   const { id, pricePesewas, sizes, published } = variant;
   const sleeveVariants = variants.filter(({ colour }) => colour === variant.colour);
@@ -79,7 +82,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <PurchaseOptions key={id} variant={{ id, pricePesewas, sizes, published }} />
           <div className="product-information">
             <details><summary>Size guide</summary><p>{variant.sizeGuide ?? "Size guidance will be published when measurements are confirmed."}</p></details>
-            <details><summary>Shipping and returns</summary><p>{merchant.shippingReturns ?? "Shipping and returns information will be published when confirmed."}</p></details>
+            <details><summary>Shipping and returns</summary><p>{shippingReturns ?? "Shipping and returns information will be published when confirmed."}</p></details>
             {variant.specifications.length > 0 && (
               <details>
                 <summary>Specifications</summary>

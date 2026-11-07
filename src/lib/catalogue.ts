@@ -1,6 +1,5 @@
 import "server-only";
 
-import { merchant } from "./merchant-config";
 import type { Colour, Sleeve, Variant } from "./shop-model";
 
 export type { Sleeve, Variant } from "./shop-model";
@@ -47,10 +46,4 @@ export const variants: readonly Variant[] = illustrations
     description,
     specifications: [],
     sizeGuide: null,
-    ...merchant.variants[slug],
-  }))
-  .filter(({ published }) => published);
-
-export function findVariant(slug: string) {
-  return variants.find((variant) => variant.slug === slug);
-}
+  }));

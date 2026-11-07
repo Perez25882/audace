@@ -3,13 +3,17 @@ import { CollectionFilter } from "@/components/collection-filter";
 import { GarmentCard } from "@/components/garment-card";
 import { GarmentImage } from "@/components/garment-image";
 import { Arrow } from "@/components/icons";
-import { sleeves, variants } from "@/lib/catalogue";
+import { sleeves } from "@/lib/catalogue";
+import { getShop } from "@/lib/server/shop";
 
 const featuredSlug = "burgundy-short-sleeve";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const { variants, mode } = await getShop();
   const featured = variants.find(({ slug }) => slug === featuredSlug) ?? variants[0];
-  if (!featured) return <section className="frame status" id="collection" tabIndex={-1}><h1>The Collection</h1><p>Check back for the next release.</p></section>;
+  if (!featured) return <section className="frame status" id="collection" tabIndex={-1}><h1>The Collection</h1><p>{mode === "unavailable" ? "The collection is temporarily unavailable. Please try again shortly." : "Check back for the next release."}</p></section>;
 
   return (
     <>

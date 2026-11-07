@@ -41,12 +41,6 @@ export type DeliveryMethod = {
   regions: readonly Region[];
 };
 
-export type MerchantConfig = {
-  variants: Readonly<Record<string, Partial<Pick<Variant, "pricePesewas" | "sizes" | "published" | "specifications" | "sizeGuide">>>>;
-  deliveryMethods: readonly DeliveryMethod[];
-  shippingReturns: string | null;
-};
-
 export function selectColourVariant<T extends Pick<Variant, "colour" | "sleeve">>(
   variants: readonly T[], colour: Colour, sleeve: Sleeve,
 ) {

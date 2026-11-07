@@ -34,7 +34,7 @@ export function checkoutQuote(
   return { ...bag, options, method, total, canReview: bag.ready && !!method && total !== null };
 }
 
-export function validateCheckout(values: CheckoutValues, options: readonly DeliveryMethod[]) {
+export function validateCheckout(values: CheckoutValues, options?: readonly DeliveryMethod[]) {
   const errors: Partial<Record<keyof CheckoutValues, string>> = {};
   for (const field of Object.keys(checkoutFields) as (keyof CheckoutValues)[]) {
     if (values[field].trim().length > checkoutFields[field]) errors[field] = "This entry is too long.";
@@ -46,7 +46,7 @@ export function validateCheckout(values: CheckoutValues, options: readonly Deliv
   if (!regions.includes(values.region as Region)) errors.region = "Select your delivery region.";
   if (!values.city.trim()) errors.city = "Enter your town or city.";
   if (!values.address.trim()) errors.address = "Enter your delivery address.";
-  if (!options.some(({ id }) => id === values.method)) errors.method = "Select an available delivery method.";
+  if (!values.method || (options && !options.some(({ id }) => id === values.method))) errors.method = "Select an available delivery method.";
 
   return errors;
 }

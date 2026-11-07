@@ -1,26 +1,27 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { cp, mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import { createServer } from "node:net";
 import path from "node:path";
 import { test } from "node:test";
 import { setTimeout as delay } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright-core";
+import { withShopGateway } from "./database/gateway.mjs";
 
 const tests = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(tests, "..");
 const work = path.join(root, "work");
 const next = fileURLToPath(import.meta.resolve("next/dist/bin/next"));
-const env = { ...process.env, NEXT_TELEMETRY_DISABLED: "1" };
+const env = { ...process.env, NEXT_TELEMETRY_DISABLED: "1", SUPABASE_URL: "", SUPABASE_PUBLISHABLE_KEY: "", SUPABASE_SERVICE_ROLE_KEY: "" };
 const screenSizes = [{ width: 1440, height: 1000 }, { width: 390, height: 844 }];
 const liveSlugs = [
   "cream-short-sleeve", "black-short-sleeve", "burgundy-short-sleeve",
   "white-short-sleeve", "cream-long-sleeve", "black-long-sleeve", "burgundy-long-sleeve",
 ];
 
-function nextProcess(args, cwd) {
-  const child = spawn(process.execPath, [next, ...args], { cwd, env, stdio: ["ignore", "pipe", "pipe"] });
+function nextProcess(args, cwd, overrides) {
+  const child = spawn(process.execPath, [next, ...args], { cwd, env: { ...env, ...overrides }, stdio: ["ignore", "pipe", "pipe"] });
   let output = "";
   child.stdout.on("data", (chunk) => { output += chunk; });
   child.stderr.on("data", (chunk) => { output += chunk; });
@@ -42,10 +43,10 @@ async function freePort() {
   return port;
 }
 
-async function withServer(cwd, run) {
+async function withServer(cwd, run, overrides = {}) {
   const port = await freePort();
   const origin = `http://127.0.0.1:${port}`;
-  const server = nextProcess(["start", "--hostname", "127.0.0.1", "--port", String(port)], cwd);
+  const server = nextProcess(["start", "--hostname", "127.0.0.1", "--port", String(port)], cwd, { ...overrides, AUDACE_APP_ORIGIN: origin });
   try {
     for (let attempt = 0; attempt < 120; attempt++) {
       if (server.child.exitCode !== null) break;
@@ -57,27 +58,6 @@ async function withServer(cwd, run) {
   } finally {
     server.child.kill();
     await server.completion;
-  }
-}
-
-async function withFixture(run) {
-  await mkdir(work, { recursive: true });
-  const directory = await mkdtemp(path.join(work, "phase-2-fixture-"));
-  try {
-    await Promise.all([
-      ...["src", "public", "package.json", "package-lock.json", "postcss.config.mjs", "tsconfig.json"].map((entry) =>
-        cp(path.join(root, entry), path.join(directory, entry), { recursive: true })),
-      symlink(path.join(root, "node_modules"), path.join(directory, "node_modules"), "junction"),
-    ]);
-    await cp(path.join(tests, "fixtures", "merchant-config.ts"), path.join(directory, "src/lib/merchant-config.ts"));
-    await writeFile(path.join(directory, "next.config.mjs"), `export default { turbopack: { root: ${JSON.stringify(root)} } };\n`);
-    const result = await nextProcess(["build"], directory).completion;
-    assert.equal(result.code, 0, result.output);
-    await withServer(directory, run);
-  } finally {
-    if (path.dirname(path.resolve(directory)) === work && path.basename(directory).startsWith("phase-2-fixture-")) {
-      await rm(directory, { recursive: true, force: true, maxRetries: 5 });
-    }
   }
 }
 
@@ -173,7 +153,7 @@ async function liveJourney(browser, origin) {
   });
 }
 
-async function fixtureJourney(browser, origin) {
+async function fixtureJourney(browser, origin, gateway) {
   for (const viewport of screenSizes) {
     await withPage(browser, viewport, async (page) => {
       const bagLink = (count) => page.getByRole("navigation", { name: "Primary" }).getByRole("link", {
@@ -227,7 +207,7 @@ async function fixtureJourney(browser, origin) {
       assert.equal(await review.isDisabled(), true);
       assert.equal(await method.isDisabled(), true);
       await page.getByLabel("Region", { exact: true }).selectOption("Greater Accra");
-      await method.selectOption("fixture-courier");
+      await method.selectOption("10000000-0000-4000-8000-000000000001");
       await page.getByLabel("Email address").fill("invalid");
       await page.getByLabel("Ghanaian phone number").fill("12345");
       await review.click();
@@ -243,14 +223,56 @@ async function fixtureJourney(browser, origin) {
       page.on("request", (request) => { if (request.method() === "POST") posts.push(request.url()); });
       await review.click();
       await page.getByText("Delivery details checked. Payments and order placement are currently unavailable.").waitFor();
-      assert.deepEqual(posts, []);
+      assert.equal(posts.length, 1);
       assert.ok(!await page.evaluate(() => JSON.stringify(localStorage).includes("Fixture Customer")));
       await checkWidth(page, viewport.width);
-      await page.screenshot({ path: path.join(work, `phase-2-fixture-checkout-${viewport.width}.png`), fullPage: true });
+      await page.screenshot({ path: path.join(work, `phase-3-fixture-checkout-${viewport.width}.png`), fullPage: true });
+      await gateway.setPrice(42000);
+      try {
+        await review.click();
+        await page.getByText(/current quote reflects a price or delivery fee change/).waitFor();
+        await page.getByRole("complementary", { name: "Order summary" }).getByText("GHS 852.50", { exact: true }).waitFor();
+      } finally {
+        await gateway.setPrice(39995);
+      }
     });
   }
   await withPage(browser, screenSizes[0], async (page) => {
     assert.equal((await page.goto(origin + "/products/black-long-sleeve")).status(), 404);
+    gateway.setOutage(true);
+    try {
+      await page.goto(origin + "/products/cream-short-sleeve");
+      await page.getByRole("heading", { name: "Collection temporarily unavailable." }).waitFor();
+      assert.equal(await page.getByRole("button", { name: "Add to Bag" }).count(), 0);
+    } finally {
+      gateway.setOutage(false);
+    }
+    await page.goto(origin + "/admin/orders/00000000-0000-4000-8000-000000000001");
+    await page.waitForURL("**/admin/login");
+    for (const email of ["customer@example.test","owner@example.test"]) {
+      await page.getByLabel("Email address").fill(email);
+      await page.getByLabel("Password", { exact: true }).fill("Synthetic test password");
+      await page.getByRole("button", { name: "Sign in" }).click();
+      if (email.startsWith("customer")) {
+        await page.waitForURL("**/admin/login?result=denied");
+        await page.getByRole("alert").getByText(/Sign-in was unsuccessful/).waitFor();
+      }
+    }
+    await page.getByRole("heading", { name: "Overview" }).waitFor();
+    assert.ok((await page.context().cookies()).some((cookie) => cookie.name.includes("auth-token") && cookie.httpOnly && cookie.sameSite === "Lax"));
+    await page.getByRole("link", { name: "Inventory", exact: true }).click();
+    const row = page.getByRole("row", { name: /FIXTURE-CR-SS-A/ });
+    await row.getByText("Set stock", { exact: true }).click();
+    await row.getByLabel("New on-hand count").fill("3");
+    await row.getByLabel("Adjustment reason").fill("Synthetic browser count");
+    await row.getByRole("button", { name: "Save adjustment" }).click();
+    await page.getByText("Changes saved.", { exact: true }).waitFor();
+    await page.getByText("Synthetic browser count", { exact: true }).waitFor();
+    await page.getByRole("button", { name: "Sign out" }).click();
+    await page.waitForURL("**/admin/login");
+    assert.ok(!(await page.context().cookies()).some((cookie) => cookie.name.includes("auth-token")));
+    await page.goto(origin + "/admin");
+    await page.waitForURL("**/admin/login");
   });
 }
 
@@ -267,7 +289,9 @@ test("live storefront blocks unconfigured commerce and preserves all seven image
 test("isolated test catalogue supports a complete guest review journey on desktop and mobile", { timeout: 360_000 }, async () => {
   const browser = await chromium.launch({ channel: process.env.AUDACE_TEST_BROWSER || "chrome" });
   try {
-    await withFixture((origin) => fixtureJourney(browser, origin));
+    await withShopGateway((gateway) => withServer(root, (origin) => fixtureJourney(browser, origin, gateway), {
+      SUPABASE_URL: gateway.url, SUPABASE_PUBLISHABLE_KEY: "fixture-publishable-key",
+    }));
   } finally {
     await browser.close();
   }

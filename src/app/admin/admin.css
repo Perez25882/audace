@@ -1,0 +1,39 @@
+body:has(.admin-layout) > :is(.site-header,.site-footer) { display: none; }
+.admin-page,.admin-login { padding-block: 1rem 4rem; }
+.admin-page > .kicker { margin-block: 2.5rem 0.75rem; color: var(--color-muted); }
+.admin-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.5rem 1.5rem; border-bottom: 1px solid var(--color-line); }
+.admin-header nav,.admin-pager { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; align-items: center; }
+.admin-header nav a,.admin-pager a { display: inline-flex; align-items: center; min-height: 2.75rem; font-weight: 650; }
+.admin-header a:hover,.admin-table a,.admin-pager a { text-decoration: underline; text-underline-offset: 0.23em; }
+.admin-login { max-width: 38rem; padding-block: 3rem 5rem; }
+.admin-login .wordmark { margin-bottom: 2rem; }
+.admin-login .shop-heading { font-size: clamp(2.7rem,7vw,4.5rem); }
+.admin-login > .text-action { margin-top: 1rem; }
+.admin-section { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--color-line); }
+.admin-section h2,.admin-panel h2,.admin-panel h3 { font: 500 clamp(1.5rem,3vw,2rem)/1.13 var(--font-display); margin-bottom: 0.5rem; }
+.admin-grid,.admin-metrics { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,19rem),1fr)); gap: 1rem; margin-block: 1.2rem; }
+.admin-panel,.admin-metrics > div { min-width: 0; padding: clamp(0.85rem,2vw,1.5rem); border: 1px solid var(--color-line); }
+.admin-metrics > div { background: var(--color-sand); }
+.admin-metrics dd { font: 500 clamp(1.5rem,4vw,2.75rem)/1.15 var(--font-display); margin-top: 0.35rem; }
+.admin-form,.admin-filters { display: grid; gap: 0.7rem; margin-block: 0.75rem; max-width: 44rem; }
+.admin-form label,.admin-filters label { display: grid; gap: 0.2rem; font-weight: 650; }
+.admin-form :is(input:not([type=checkbox]),textarea,select),.admin-filters :is(input,select) {
+  min-width: 0; width: 100%; min-height: 2.75rem; padding: 0.4rem 0.65rem; font-size: 1rem;
+  border: 1px solid var(--color-line); background: var(--color-paper); color: var(--color-espresso);
+}
+.admin-form .admin-check { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; }
+.admin-check input { width: 1rem; height: 1rem; accent-color: var(--color-espresso); }
+.admin-filters { display: flex; flex-wrap: wrap; align-items: end; max-width: none; }
+.admin-filters label { flex: 0 1 15rem; }
+.admin-table { overflow-x: auto; margin-block: 0.75rem 1rem; }
+.admin-table table { width: 100%; min-width: 38rem; border-collapse: collapse; text-align: left; }
+.admin-table :is(th,td) { padding: 0.6rem; border-bottom: 1px solid var(--color-line); vertical-align: top; }
+.admin-table thead { background: var(--color-sand); }
+.admin-table small { display: block; color: var(--color-muted); }
+.admin-variant { display: flex; align-items: center; gap: 0.8rem; }
+.admin-variant img { width: 5.75rem; height: auto; border: 1px solid var(--color-line); }
+.admin-disclosure { margin-block: 0.5rem; }
+.admin-disclosure summary { cursor: pointer; min-height: 2.75rem; padding-block: 0.55rem; }
+.admin-line,.admin-definitions > div { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.35rem 0.85rem; padding-block: 0.45rem; border-bottom: 1px solid var(--color-line); overflow-wrap: anywhere; }
+.admin-definitions { margin-block: 0.75rem; }
+.admin-address { font-style: normal; overflow-wrap: anywhere; }
