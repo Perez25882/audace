@@ -12,6 +12,7 @@ export function AdminPage({ title, role, children }: { title: string; role: Admi
           <Link href="/admin/catalogue">Catalogue</Link>
           <Link href="/admin/inventory">Inventory</Link>
           <Link href="/admin/orders">Orders</Link>
+          <Link href="/admin/payments">Payments</Link>
           <Link href="/admin/delivery">Delivery</Link>
         </nav>
         <form action={signOutAdmin}><button className="text-action" type="submit">Sign out</button></form>
@@ -25,6 +26,8 @@ export function AdminPage({ title, role, children }: { title: string; role: Admi
 
 const results: Record<string,string> = {
   saved: "Changes saved.",
+  resolved: "Inventory review resolved.",
+  "refund-review": "Refund review recorded. Provider processing awaits approval.",
   error: "The change could not be saved. Check the details and try again.",
   stale: "Stock changed since this page loaded. Review the current count and try again.",
   reserved: "The new count would fall below units held for pending orders.",

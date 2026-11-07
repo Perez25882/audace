@@ -484,3 +484,13 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
 
 .single-sleeve { padding-block: 0.65rem; }
 .single-sleeve h2 { margin-bottom: 0; }
+
+.payment-amount { font: 500 clamp(2rem,5vw,3.5rem)/1.1 var(--font-display); margin-block: 1.5rem; }
+.payment-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.payment-start { display: grid; justify-items: start; gap: 0.5rem; }
+.payment-start p { font-size: 0.78rem; color: var(--color-muted); max-width: 44ch; }
+.confirmation-title { font: 500 1.85rem/1.15 var(--font-display); margin-block: 0.8rem; }
+.confirmation-items li { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.45rem 1rem; padding-block: 0.8rem; border-bottom: 1px solid var(--color-line); }
+.confirmation-items h3 { font: 500 1.4rem/1.15 var(--font-display); }
+.confirmation-items p { color: var(--color-muted); }
+.confirmation-address { font-style: normal; overflow-wrap: anywhere; margin-bottom: 0.5rem; }

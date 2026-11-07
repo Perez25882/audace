@@ -8,7 +8,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Search
   const entries = [
     ["Total orders",metrics.total], ["Pending orders",metrics.pending], ["Paid orders",metrics.paid],
     ["Fulfilment queue",metrics.fulfilment], ["Low-stock SKUs",metrics.low], ["Out-of-stock SKUs",metrics.out],
-    ["Verified paid revenue",formatGhs(BigInt(metrics.revenue))],
+    ["Verified paid revenue",formatGhs(BigInt(metrics.revenue))], ["Payment review",metrics.review],
   ];
   return <AdminPage title="Overview" role={role}>
     <ResultNotice result={queryValue(await searchParams,"result")} />

@@ -2,6 +2,7 @@
 
 import { createHash } from "node:crypto";
 import { redirect } from "next/navigation";
+import { parseGhs } from "@/lib/bag";
 import { uuidPattern } from "@/lib/checkout-input";
 import { regions } from "@/lib/shop-model";
 import { requireAdmin } from "@/lib/server/admin";
@@ -39,11 +40,7 @@ function count(form: FormData, name: string) {
 function pesewas(form: FormData, name: string, optional = false) {
   const raw = field(form, name, 11, optional);
   if (optional && !raw) return null;
-  const parts = /^(\d{1,8})(?:\.(\d{1,2}))?$/.exec(raw);
-  if (!parts) throw new Error("invalid_input");
-  const price = Number(parts[1]) * 100 + Number((parts[2] ?? "").padEnd(2, "0"));
-  if (price > 1_000_000_000) throw new Error("invalid_input");
-  return price;
+  return parseGhs(raw);
 }
 
 export async function signInAdmin(form: FormData) {

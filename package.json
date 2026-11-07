@@ -11,9 +11,9 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "tsc -p tests/tsconfig.json && node --test work/test-build/tests/shop.test.js",
-    "test:e2e": "node --test tests/shop.browser.test.mjs",
-    "test:db": "node --test tests/database.test.mjs"
+    "test": "tsc -p tests/tsconfig.json && node --test work/test-build/tests/shop.test.js work/test-build/tests/payments.test.js",
+    "test:e2e": "node --test --test-concurrency=1 tests/shop.browser.test.mjs tests/payment.browser.test.mjs",
+    "test:db": "node --test tests/database.test.mjs tests/payments.database.test.mjs"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "5.3.0",
@@ -31,6 +31,7 @@
     "@types/react-dom": "19.3.0",
     "eslint": "9.39.5",
     "eslint-config-next": "16.4.5",
+    "pg": "8.23.1",
     "playwright-core": "1.65.0",
     "postcss": "8.5.32",
     "tailwindcss": "4.3.5",

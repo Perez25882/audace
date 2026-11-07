@@ -21,7 +21,7 @@ supabase migration up --local
 supabase status
 ```
 
-Copy `.env.example` to `.env.local`. Set the API URL and publishable key from the local project's status output, set the app origin, and restart Next.js. For a hosted environment, use your project's API settings and actual HTTPS app origin. See the [Phase 3 operations guide](docs/phase-3.md) for initial administrator provisioning and the reservation lifecycle.
+Copy `.env.example` to `.env.local`. Set the API URL and publishable key from the local project's status output, set the app origin, and restart Next.js. For a hosted environment, use your project's API settings and actual HTTPS app origin. See the [Phase 3 operations guide](docs/phase-3.md) for initial administrator provisioning. The [Phase 4 payment guide](docs/phase-4.md) covers test-only Paystack credentials, channel approval, webhook signing, the required reconciliation scheduler and inventory exceptions. Payment keys remain server-only. Missing configuration disables payments safely.
 
 ## Checks
 
@@ -42,9 +42,13 @@ The database and browser suites use disposable local PostgreSQL clusters. Instal
 | --- | --- |
 | `/`, `/products/[slug]` | Database-backed collection and garment details, with an illustrations-only mode when Supabase is unconfigured |
 | `/bag` | Browser-persisted bag, repriced from the current catalogue |
-| `/checkout` | Guest validation and database quote. Review ends before order placement |
-| `/order-confirmation` | Empty confirmation state |
+| `/checkout` | Guest validation, authoritative quote and configured test-mode hosted payment |
+| `/payment-status` | Capability-protected verification, pending states and safe retry |
+| `/order-confirmation` | Protected confirmation only for verified, allocated orders; empty state without order access |
 | `/admin/login` | Private staff sign-in |
 | `/admin` | Overview, catalogue, inventory, orders and delivery operations |
+| `/admin/payments` | Private attempts, provider checks and exception visibility |
+| `/api/payments/*` | Server initialization, owned verification and authenticated durable webhooks |
+| `/api/internal/payments/reconcile` | Bearer-protected scheduled queue worker |
 
 Phase 3 moves merchant configuration to the protected admin. The catalogue migration seeds the approved garments and leaves prices, size SKUs, stock and delivery methods awaiting merchant entry. The original artwork and variant slugs are recorded in the [asset inventory](docs/assets.md). UI tokens remain in the [design system](docs/design-system.md).

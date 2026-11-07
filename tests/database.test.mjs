@@ -22,7 +22,7 @@ function as(role, subject = "") {
 }
 
 function pending(request, lines = [line()], customer = contact, delivery = method) {
-  return db.query(as("service_role") + "select audace_place_pending(:'request',:'lines',:'delivery',:'contact');", {
+  return db.query("select audace_place_pending(:'request',:'lines',:'delivery',:'contact');", {
     request, lines:JSON.stringify(lines), delivery, contact:JSON.stringify(customer),
   }).then(JSON.parse);
 }
@@ -122,11 +122,11 @@ test("expired stock recovers before the sweep and verified finalization is exact
   const expired = await pending(randomUUID());
   await db.query("update audace_orders set expires_at=now()-interval '1 second' where id=:'id'; update audace_reservations set expires_at=now()-interval '1 second' where order_id=:'id';",{id:expired.id});
   assert.equal((await quote([line()])).subtotal,39995);
-  await assert.rejects(db.query(as("service_role") + "select audace_finalize_verified(:'id','late',41245,'GHS');",{id:expired.id}),/reservation_unavailable/);
+  await assert.rejects(db.query("select audace_finalize_verified(:'id','late',41245,'GHS');",{id:expired.id}),/reservation_unavailable/);
   assert.equal(await db.query(as("service_role") + "select audace_expire_orders(100);"),"1");
   assert.equal(await db.query(as("service_role") + "select audace_expire_orders(100);"),"0");
   const order = await pending(randomUUID());
-  const final = (amount, currency = "GHS") => db.query(as("service_role") + "select audace_finalize_verified(:'id','fixture-verification',:'amount',:'currency');",{
+  const final = (amount, currency = "GHS") => db.query("select audace_finalize_verified(:'id','fixture-verification',:'amount',:'currency');",{
     id:order.id,amount,currency,
   });
   await assert.rejects(final(1),/payment_mismatch/);
@@ -136,9 +136,9 @@ test("expired stock recovers before the sweep and verified finalization is exact
   assert.equal(await db.query("select on_hand from audace_stock where sku_id=:'sku';",{sku}),"0");
   assert.equal(await db.query("select count(*) from audace_movements where order_id=:'id';",{id:order.id}),"1");
   await assert.rejects(db.query(as("authenticated",operator) + "select audace_admin_order_action(:'id','delivered');",{id:order.id}),/invalid_transition/);
-  for (const action of ["processing","shipped","delivered"]) await db.query(as("authenticated",operator) + "select audace_admin_order_action(:'id',:'action');",{id:order.id,action});
+  await assert.rejects(db.query(as("authenticated",operator) + "select audace_admin_order_action(:'id','processing');",{id:order.id}),/payment_review_required/);
   const metrics = JSON.parse(await db.query(as("authenticated",operator) + "select audace_admin_metrics();"));
-  assert.equal(metrics.revenue,"41245");
+  assert.equal(metrics.revenue,"0");
   assert.equal(metrics.paid,1);
   assert.equal(metrics.fulfilment,0);
 });

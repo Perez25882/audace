@@ -6,7 +6,7 @@ export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
   try {
     const config = backendConfig();
-    if (config) {
+    if (config && request.nextUrl.pathname.startsWith("/admin")) {
       const client = createServerClient(config.url, config.key, {
         cookieOptions: adminCookieOptions(),
         cookies: {
@@ -30,4 +30,4 @@ export async function proxy(request: NextRequest) {
   return response;
 }
 
-export const config = { matcher: ["/admin/:path*"] };
+export const config = { matcher: ["/admin/:path*", "/payment-status", "/order-confirmation", "/api/payments/:path*"] };

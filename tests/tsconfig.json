@@ -8,5 +8,5 @@
     "rootDir": "..",
     "outDir": "../work/test-build"
   },
-  "include": ["shop.test.ts"]
+  "include": ["shop.test.ts", "payments.test.ts"]
 }
