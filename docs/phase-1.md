@@ -16,7 +16,9 @@
 - The illustrated front views and text wordmark are the available brand assets. Product specifications, sizes, price, stock and delivery information await brand approval.
 - The bag, checkout and confirmation routes describe their current state. Transactions, fulfilment and the private admin are outside Phase 1.
 
-## Phase 2
+## Original Phase 2 proposal
+
+See [the Phase 2 report](phase-2.md) for the scope delivered after this proposal.
 
 1. Approve the commercial catalogue and operating rules. Confirm size matrix, variant identifiers, pricing and currency, available stock, shipping zones and fees, returns, and fulfilment.
 2. Add versioned Supabase migrations for catalogue, inventory, orders, line items and payment attempts. Seed the seven variant slugs, authorize database access with scoped grants and row-level security, and add the private admin with explicit roles. [Supabase row-level security](https://supabase.com/docs/guides/database/postgres/row-level-security)

@@ -1,24 +1,23 @@
 import Image from "next/image";
-import { garmentSource, type Variant } from "@/lib/catalogue";
+import type { GarmentAsset } from "@/lib/shop-model";
 
 export function GarmentImage({
-  variant,
-  sizes,
-  aboveFold = false,
-  decorative = false,
+  asset, sizes, aboveFold = false, decorative = false, original = false,
 }: {
-  variant: Variant;
+  asset: GarmentAsset;
   sizes: string;
   aboveFold?: boolean;
   decorative?: boolean;
+  original?: boolean;
 }) {
   return (
     <Image
-      src={garmentSource(variant)}
-      alt={decorative ? "" : `${variant.colour} ${variant.sleeve.toLowerCase()} shirt, front view`}
-      width={variant.width}
-      height={variant.height}
-      sizes={sizes}
+      src={asset.src}
+      alt={decorative ? "" : asset.alt}
+      width={asset.width}
+      height={asset.height}
+      sizes={original ? undefined : sizes}
+      unoptimized={original}
       loading={aboveFold ? "eager" : undefined}
       fetchPriority={aboveFold ? "high" : undefined}
       className="garment-image"

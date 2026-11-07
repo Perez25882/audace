@@ -8,8 +8,8 @@ import { sleeves, variants } from "@/lib/catalogue";
 const featuredSlug = "burgundy-short-sleeve";
 
 export default function HomePage() {
-  const featured = variants.find(({ slug }) => slug === featuredSlug);
-  if (!featured) throw new Error("The featured garment is missing from the catalogue.");
+  const featured = variants.find(({ slug }) => slug === featuredSlug) ?? variants[0];
+  if (!featured) return <section className="frame status" id="collection" tabIndex={-1}><h1>The Collection</h1><p>Check back for the next release.</p></section>;
 
   return (
     <>
@@ -22,11 +22,11 @@ export default function HomePage() {
         </div>
         <figure className="hero-figure">
           <div className="hero-image">
-            <GarmentImage variant={featured} sizes="(min-width: 80rem) 465px, (min-width: 56rem) 42vw, 82vw" aboveFold />
+            <GarmentImage asset={featured.images[0]} sizes="(min-width: 80rem) 465px, (min-width: 56rem) 42vw, 82vw" aboveFold />
           </div>
           <figcaption className="hero-caption">
             <span>Garment illustration</span>
-            <Link href={`/products/${featured.slug}`}>Burgundy, short sleeve <Arrow direction="up-right" /></Link>
+            <Link href={`/products/${featured.slug}`}>{featured.colour}, {featured.sleeve.toLowerCase()} <Arrow direction="up-right" /></Link>
           </figcaption>
         </figure>
       </section>
@@ -42,13 +42,13 @@ export default function HomePage() {
       </section>
       <section className="frame detail-section" aria-labelledby="detail-title">
         <div className="detail-crop" aria-hidden="true">
-          <GarmentImage variant={featured} sizes="(min-width: 56rem) 900px, 100vw" decorative />
+          <GarmentImage asset={featured.images[0]} sizes="(min-width: 56rem) 900px, 100vw" decorative />
         </div>
         <div className="detail-copy">
           <p className="kicker">The design</p>
           <h2 id="detail-title">The details speak quietly.</h2>
           <p>A stand collar, tonal fabric-loop closures and a small label at the lower hem.</p>
-          <Link href={`/products/${featured.slug}`}>View the Burgundy shirt <Arrow direction="up-right" /></Link>
+          <Link href={`/products/${featured.slug}`}>View the {featured.colour} shirt <Arrow direction="up-right" /></Link>
         </div>
       </section>
     </>

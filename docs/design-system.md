@@ -26,3 +26,9 @@ AUDACE is set in a tracked text wordmark. Newsreader supplies the wordmark and d
 - Native links and buttons receive visible focus outlines. Active filters use `aria-pressed`, count updates use a status region, and current variant links use `aria-current`. Controls remain visible across breakpoints. The layout uses no entrance animation or autoplay.
 
 Shared components live in `src/components`. Global tokens and responsive styles live in `src/app/globals.css`.
+
+## Shopping controls
+
+- Product details use the existing editorial image plate beside a more compact column for colour, sleeve, size, and price. The zoom dialog shows the original artwork, returns focus to its opener, and supports Escape to close.
+- Sand indicates a selected option or a summary panel. Espresso indicates the primary action, and burgundy marks validation and focus. Disabled actions remain visible with nearby availability information.
+- Bag and checkout summaries sit beside the main column on wide screens and follow it on narrow screens. Form fields use descriptive labels, readable type, and matching mobile keyboard hints.

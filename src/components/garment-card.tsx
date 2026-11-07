@@ -7,7 +7,7 @@ export function GarmentCard({ variant }: { variant: Variant }) {
   return (
     <Link className="garment-card" href={`/products/${variant.slug}`}>
       <div className="card-image">
-        <GarmentImage variant={variant} sizes="(min-width: 80rem) 265px, (min-width: 58rem) 22vw, (min-width: 40rem) 30vw, 45vw" decorative />
+        <GarmentImage asset={variant.images[0]} sizes="(min-width: 80rem) 265px, (min-width: 58rem) 22vw, (min-width: 40rem) 30vw, 45vw" decorative />
       </div>
       <div className="card-caption">
         <div>

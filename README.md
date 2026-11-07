@@ -1,6 +1,6 @@
 # AUDACE
 
-Phase 1 is a local, browsable menswear storefront for the first AUDACE release. It includes the homepage and collection, seven garment detail pages, and entry points for future commerce.
+AUDACE is a local menswear storefront for the first release. Phase 2 adds garment zoom, size and quantity selection, a persistent bag, and guest checkout review to the Phase 1 collection.
 
 ## Local development
 
@@ -11,37 +11,44 @@ npm ci
 npm run dev
 ```
 
-Open [the local storefront](http://localhost:3000). Phase 1 runs without environment variables. See [.env.example](.env.example) for reserved configuration names.
+Open [the local storefront](http://localhost:3000). The storefront runs without credentials. See [.env.example](.env.example) for reserved configuration names.
 
 ```powershell
 npm run lint
 npm run typecheck
+npm test
 npm run build
+npm run test:e2e
 npm start
 ```
 
-Run `npm start` after building to serve the production version on port 3000.
+Browser tests require a locally installed Chrome. They launch the production build and a temporary, independent build with clearly labelled test data. `npm start` serves the normal production build on port 3000.
 
 ## Routes
 
-| Route | Phase 1 behavior |
+| Route | Behavior |
 | --- | --- |
 | `/` | Editorial homepage and sleeve-filtered collection at `#collection` |
-| `/products/[slug]` | Individual garment view with links to approved colour and sleeve combinations |
-| `/bag` | Empty bag |
-| `/checkout` | Checkout availability notice |
+| `/products/[slug]` | Prerendered garment detail, image gallery and approved colour and sleeve navigation |
+| `/bag` | Persistent, editable bag with stock checks and integer-pesewa subtotals |
+| `/checkout` | Guest delivery form, validation and order summary. Review depends on configured stock, prices and delivery |
 | `/order-confirmation` | Empty order state |
-| Unknown route or variant | 404 with a link back to the collection |
+| Unknown or unpublished variant | HTTP 404 with a link back to the collection |
+
+## Merchant configuration
+
+Use [src/lib/merchant-config.ts](src/lib/merchant-config.ts) for merchant-approved prices in pesewas, size labels and per-size stock, publish state, specifications, size guidance, and delivery options. Use the existing public variant slugs as keys. The shipped configuration is empty. Missing prices, sizes or stock disable adding the affected item to the bag. Delivery methods need explicit region coverage and fees. Rebuild the production site after updating this file.
 
 ## Implementation
 
-Next.js App Router serves the layout, collection cards, and typed garment catalogue as server components. Product routes are prerendered from stable variant slugs. The collection filter uses client-side state and native toggle buttons. Product variant selectors use ordinary links so each approved combination has a shareable URL. An error boundary provides a retry action, and the product segment has a loading state.
+Next.js App Router prerenders the collection and product routes from the server catalogue. Only interactive controls and shopping views use client components. The bag stores variant IDs, size labels and quantities in browser local storage. Prices and stock come from the catalogue in the current build. Shared bag and checkout functions validate quantities and compute estimates in integer pesewas. Checkout details stay on the form in the current page.
 
-Tailwind v4 exposes shared tokens alongside component styles in `src/app/globals.css`. The display and interface fonts are bundled locally. Next Image serves responsive derivatives of the lossless catalogue assets.
+Tailwind v4 exposes shared tokens alongside component styles in `src/app/globals.css`. Local fonts and responsive derivatives of the PDF rasters serve the storefront. The zoom dialog uses the original WebP.
 
 - [Garment asset inventory](docs/assets.md)
 - [Design system](docs/design-system.md)
-- [Phase 1 completion and Phase 2 plan](docs/phase-1.md)
+- [Phase 1 completion](docs/phase-1.md)
+- [Phase 2 implementation and review](docs/phase-2.md)
 - [Project rules](AGENTS.md)
 
 The tooling follows the [Next.js App Router installation guide](https://nextjs.org/docs/app/getting-started/installation) and the [Tailwind CSS guide for Next.js](https://tailwindcss.com/docs/installation/framework-guides/nextjs).

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import { Status } from "@/components/status";
+import { CheckoutView } from "@/components/checkout-view";
+import { variants } from "@/lib/catalogue";
+import { merchant } from "@/lib/merchant-config";
 
 export const metadata: Metadata = { title: "Checkout", robots: { index: false } };
 
 export default function CheckoutPage() {
-  return <Status title="Checkout is unavailable." label="Checkout" description="You can explore the collection while ordering is being prepared." />;
+  return <CheckoutView variants={variants} methods={merchant.deliveryMethods} />;
 }

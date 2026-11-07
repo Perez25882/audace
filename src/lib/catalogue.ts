@@ -1,16 +1,9 @@
 import "server-only";
 
-export type Colour = "Cream" | "Black" | "Burgundy" | "White";
-export type Sleeve = "Short sleeve" | "Long sleeve";
+import { merchant } from "./merchant-config";
+import type { Colour, Sleeve, Variant } from "./shop-model";
 
-export type Variant = {
-  slug: string;
-  colour: Colour;
-  sleeve: Sleeve;
-  width: number;
-  height: number;
-  reference: { page: number; position: "top" | "bottom"; xref: number };
-};
+export type { Sleeve, Variant } from "./shop-model";
 
 export const colours = {
   Cream: "#e2d6c5",
@@ -21,20 +14,43 @@ export const colours = {
 
 export const sleeves = ["Short sleeve", "Long sleeve"] as const satisfies readonly Sleeve[];
 
-export const variants: readonly Variant[] = [
-  { slug: "cream-short-sleeve", colour: "Cream", sleeve: "Short sleeve", width: 742, height: 764, reference: { page: 1, position: "top", xref: 19 } },
-  { slug: "black-short-sleeve", colour: "Black", sleeve: "Short sleeve", width: 742, height: 764, reference: { page: 2, position: "top", xref: 23 } },
-  { slug: "burgundy-short-sleeve", colour: "Burgundy", sleeve: "Short sleeve", width: 742, height: 764, reference: { page: 3, position: "top", xref: 27 } },
-  { slug: "white-short-sleeve", colour: "White", sleeve: "Short sleeve", width: 742, height: 764, reference: { page: 4, position: "top", xref: 32 } },
-  { slug: "cream-long-sleeve", colour: "Cream", sleeve: "Long sleeve", width: 742, height: 764, reference: { page: 1, position: "bottom", xref: 20 } },
-  { slug: "black-long-sleeve", colour: "Black", sleeve: "Long sleeve", width: 741, height: 765, reference: { page: 2, position: "bottom", xref: 24 } },
-  { slug: "burgundy-long-sleeve", colour: "Burgundy", sleeve: "Long sleeve", width: 741, height: 765, reference: { page: 3, position: "bottom", xref: 28 } },
-];
+const illustrations = [
+  ["cream-short-sleeve", "CR-SS", "Cream", "Short sleeve", 742, 764],
+  ["black-short-sleeve", "BK-SS", "Black", "Short sleeve", 742, 764],
+  ["burgundy-short-sleeve", "BG-SS", "Burgundy", "Short sleeve", 742, 764],
+  ["white-short-sleeve", "WH-SS", "White", "Short sleeve", 742, 764],
+  ["cream-long-sleeve", "CR-LS", "Cream", "Long sleeve", 742, 764],
+  ["black-long-sleeve", "BK-LS", "Black", "Long sleeve", 741, 765],
+  ["burgundy-long-sleeve", "BG-LS", "Burgundy", "Long sleeve", 741, 765],
+] as const;
+
+const description = "A stand collar, three tonal fabric-loop fastenings and a small label at the lower hem.";
+
+export const variants: readonly Variant[] = illustrations
+  .map(([slug, code, colour, sleeve, width, height]): Variant => ({
+    id: `audace-${code.toLowerCase()}`,
+    sku: `AUD-${code}`,
+    name: "Stand-collar shirt",
+    slug,
+    colour,
+    sleeve,
+    images: [{
+      src: `/garments/${slug}.webp`,
+      width,
+      height,
+      alt: `${colour} ${sleeve.toLowerCase()} shirt, front view`,
+      label: "Front view",
+    }],
+    pricePesewas: null,
+    sizes: [],
+    published: true,
+    description,
+    specifications: [],
+    sizeGuide: null,
+    ...merchant.variants[slug],
+  }))
+  .filter(({ published }) => published);
 
 export function findVariant(slug: string) {
   return variants.find((variant) => variant.slug === slug);
-}
-
-export function garmentSource(variant: Variant) {
-  return `/garments/${variant.slug}.webp`;
 }

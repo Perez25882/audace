@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Arrow, BagIcon } from "./icons";
+import { Arrow } from "./icons";
+import { BagLink } from "./bag-link";
 
 export function Header() {
   return (
@@ -7,9 +8,7 @@ export function Header() {
       <nav className="frame header-grid" aria-label="Primary">
         <Link className="header-link" href="/#collection">Collection</Link>
         <Link className="wordmark" href="/" aria-label="AUDACE home">AUDACE</Link>
-        <Link className="header-link bag-link" href="/bag">
-          <BagIcon /> <span>Bag</span>
-        </Link>
+        <BagLink />
       </nav>
     </header>
   );
