@@ -77,7 +77,7 @@ export default async function Order({
         : null;
 
   return (
-    <AdminPage title={order.public_ref} role={role}>
+    <AdminPage title={order.public_ref} role={role} reference>
       <Link className="text-action" href="/admin/orders">
         Back to orders
       </Link>

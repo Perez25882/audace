@@ -1,13 +1,18 @@
 import Link from "next/link";
 import { Arrow } from "./icons";
 import { BagLink } from "./bag-link";
+import { storeInformation } from "@/lib/store-information";
 
 export function Header() {
   return (
     <header className="site-header">
       <nav className="frame header-grid" aria-label="Primary">
-        <Link className="header-link" href="/#collection">Collection</Link>
-        <Link className="wordmark" href="/" aria-label="AUDACE home">AUDACE</Link>
+        <Link className="header-link" href="/#collection">
+          Collection
+        </Link>
+        <Link className="wordmark" href="/" aria-label="AUDACE home">
+          AUDACE
+        </Link>
         <BagLink />
       </nav>
     </header>
@@ -20,15 +25,32 @@ export function Footer() {
       <div className="frame">
         <div className="footer-main">
           <div>
-            <Link className="wordmark footer-wordmark" href="/" aria-label="AUDACE home">AUDACE</Link>
+            <Link
+              className="wordmark footer-wordmark"
+              href="/"
+              aria-label="AUDACE home"
+            >
+              AUDACE
+            </Link>
             <p className="footer-philosophy">Presence Without Announcement.</p>
           </div>
           <nav className="footer-nav" aria-label="Footer">
-            <Link href="/#collection">Collection <Arrow direction="up-right" /></Link>
-            <Link href="/bag">Bag <Arrow direction="up-right" /></Link>
+            <Link href="/#collection">
+              Collection <Arrow direction="up-right" />
+            </Link>
+            <Link href="/bag">
+              Bag <Arrow direction="up-right" />
+            </Link>
+            {storeInformation.some((item) => item.body) && (
+              <Link href="/information">
+                Store information <Arrow direction="up-right" />
+              </Link>
+            )}
           </nav>
         </div>
-        <p className="footer-base">AUDACE <span aria-hidden="true">/</span> Ghana</p>
+        <p className="footer-base">
+          AUDACE <span aria-hidden="true">/</span> Ghana
+        </p>
       </div>
     </footer>
   );

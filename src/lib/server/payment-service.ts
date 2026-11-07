@@ -12,6 +12,7 @@ import { checkoutUrl } from "@/lib/payments/config";
 import { digest } from "@/lib/payments/security";
 import { dataClient } from "./supabase";
 import { paymentConfig, initializeProvider, verifyProvider } from "./paystack";
+import { observe } from "./observe";
 
 export type CustomerOrder = {
   orderId: string;
@@ -78,6 +79,7 @@ export async function rpc<T>(
     .rpc(name, parameters)
     .abortSignal(AbortSignal.timeout(8000));
   if (error) {
+    observe("database_error", { code: "rpc_unavailable" });
     const codes = [
       "price_changed",
       "request_conflict",
@@ -147,6 +149,10 @@ export async function reconcileReference(reference: string) {
   try {
     data = await verifyProvider(config, reference);
   } catch {
+    observe("provider_error", {
+      code: "provider_unavailable",
+      attemptId: expected.attemptId,
+    });
     return { done: false, error: "provider_unavailable" };
   }
   try {
@@ -171,6 +177,10 @@ export async function reconcileReference(reference: string) {
         p_attempt: expected.attemptId,
         p_code: "verification_mismatch",
       });
+      observe("verification_rejected", {
+        code: "verification_mismatch",
+        attemptId: expected.attemptId,
+      });
       return { done: true, error: "verification_mismatch" };
     }
     throw error;
@@ -193,6 +203,8 @@ async function runJob(job: PaymentJob) {
     p_done: done,
     p_error: error,
   });
+  if (error)
+    observe("payment_retry", { code: error, attemptId: job.attemptId });
 }
 
 export async function runPaymentJobs(attemptId?: string) {
@@ -241,6 +253,10 @@ async function initializeAttempt(started: Started) {
     });
     return { ...started, authorizationUrl: saved ? url : null };
   } catch {
+    observe("initialization_uncertain", {
+      code: "provider_unavailable",
+      attemptId: started.attemptId,
+    });
     await rpc("audace_payment_save_init", {
       p_attempt: started.attemptId,
       p_lease: lease,

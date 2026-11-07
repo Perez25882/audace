@@ -4,7 +4,7 @@ AUDACE is a Ghanaian menswear storefront and private store operations console. T
 
 ## Local development
 
-Use Node.js 22 or newer and npm. From this folder, run:
+Use Node.js 22.23.4 (recorded in `.nvmrc`) and npm. From this folder, run:
 
 ```powershell
 npm ci
@@ -23,6 +23,8 @@ supabase status
 
 Copy `.env.example` to `.env.local`. Set the API URL and publishable key from the local project's status output, set the app origin, and restart Next.js. For a hosted environment, use your project's API settings and actual HTTPS app origin. See the [Phase 3 operations guide](docs/phase-3.md) for initial administrator provisioning. The [Phase 4 payment guide](docs/phase-4.md) covers test-only Paystack credentials, channel approval, webhook signing, the required reconciliation scheduler and inventory exceptions. Payment keys remain server-only. Missing configuration disables payments safely.
 
+The [deployment and recovery runbook](docs/deployment-runbook.md) and [release checklist](docs/release-checklist.md) govern staging preparation. Public indexing defaults off. Set an approved `AUDACE_PUBLIC_ORIGIN` and deliberately enable indexing only after review. Contact and legal copy stays unpublished until the founder provides approved text. Live keys remain rejected.
+
 ## Checks
 
 ```powershell
@@ -32,9 +34,13 @@ npm test
 npm run test:db
 npm run build
 npm run test:e2e
+npm run test:qa
+npm run test:perf
 ```
 
 The database and browser suites use disposable local PostgreSQL clusters. Install PostgreSQL 17 client and server binaries and put them on PATH, or set `AUDACE_PG_BIN` to the bin directory. Browser tests also require Chrome. Run the production build before the browser suite.
+
+Release QA also uses WebKit installed under `work/browsers`; setup commands are in the runbook. `npm run verify` executes lint, types, unit/database tests, build and both browser suites sequentially. Never run a build while browser or Lighthouse tests are serving `.next`. Performance evidence is laboratory data; physical-device, screen-reader, hosted merchant and real-user checks remain separate.
 
 ## Routes
 
@@ -50,5 +56,9 @@ The database and browser suites use disposable local PostgreSQL clusters. Instal
 | `/admin/payments` | Private attempts, provider checks and exception visibility |
 | `/api/payments/*` | Server initialization, owned verification and authenticated durable webhooks |
 | `/api/internal/payments/reconcile` | Bearer-protected scheduled queue worker |
+| `/api/health` | Public application liveness only |
+| `/api/internal/health` | Bearer-protected database/queue/worker readiness aggregates |
+| `/robots.txt`, `/sitemap.xml` | Opt-in indexing of published products; staging excluded |
+| `/information` | Approved support/policy sections only; honest unavailable state until supplied |
 
 Phase 3 moves merchant configuration to the protected admin. The catalogue migration seeds the approved garments and leaves prices, size SKUs, stock and delivery methods awaiting merchant entry. The original artwork and variant slugs are recorded in the [asset inventory](docs/assets.md). UI tokens remain in the [design system](docs/design-system.md).

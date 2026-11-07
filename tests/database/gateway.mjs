@@ -83,6 +83,13 @@ export async function withShopGateway(run) {
           : user
             ? "authenticated"
             : "anon";
+      const sendRows = (rows) =>
+        send(
+          200,
+          request.headers.accept?.includes("application/vnd.pgrst.object")
+            ? (rows[0] ?? null)
+            : rows,
+        );
       const match = /^\/rest\/v1\/rpc\/(audace_[a-z0-9_]+)$/.exec(url.pathname);
       if (match && request.method === "POST") {
         if (match[1] === "audace_public_shop" && unavailable)
@@ -117,6 +124,58 @@ export async function withShopGateway(run) {
           ),
         );
       }
+      if (
+        request.method === "GET" &&
+        url.pathname.startsWith("/rest/v1/audace_")
+      ) {
+        if (!user) return send(401, { message: "Unauthorized" });
+        const table = url.pathname.split("/").at(-1);
+        const orderId =
+          url.searchParams.get("order_id")?.replace(/^eq\./, "") ??
+          url.searchParams.get("id")?.replace(/^eq\./, "") ??
+          null;
+        if (table === "audace_products")
+          return sendRows(
+            await db.sql(
+              role,
+              user.id,
+              `select p.*,
+          (select coalesce(jsonb_agg(to_jsonb(v) || jsonb_build_object(
+            'audace_images',(select coalesce(jsonb_agg(i),'[]') from audace_images i where i.variant_id=v.id),
+            'audace_skus',(select coalesce(jsonb_agg(s),'[]') from audace_skus s where s.variant_id=v.id)) order by v.sort_order),'[]')
+            from audace_variants v where v.product_id=p.id) as audace_variants
+          from audace_products p order by p.name`,
+            ),
+          );
+        if (table === "audace_delivery" || table === "audace_settings")
+          return sendRows(
+            await db.sql(role, user.id, "select * from " + table),
+          );
+        if (table === "audace_orders")
+          return sendRows(
+            await db.sql(
+              role,
+              user.id,
+              "select * from audace_orders where ($1::uuid is null or id=$1) order by created_at desc limit 51",
+              [orderId],
+            ),
+          );
+        if (
+          [
+            "audace_order_contacts",
+            "audace_order_items",
+            "audace_order_history",
+          ].includes(table)
+        )
+          return sendRows(
+            await db.sql(
+              role,
+              user.id,
+              "select * from " + table + " where order_id=$1",
+              [orderId],
+            ),
+          );
+      }
       return send(404, { message: "Unknown fixture endpoint" });
     } catch (error) {
       return send(400, {
@@ -139,6 +198,7 @@ export async function withShopGateway(run) {
     return await run({
       url: `http://127.0.0.1:${server.address().port}`,
       db,
+      expireSessions: () => sessions.clear(),
       setOutage: (value) => {
         unavailable = value;
       },

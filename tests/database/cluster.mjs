@@ -155,10 +155,10 @@ export async function startDatabase() {
       max: 8,
       statement_timeout: 15000,
     });
-    const sql = async (role, subject, text, values = []) => {
+    const sql = async (role, subject, text, values = [], sourcePool = pool) => {
       if (!["anon", "authenticated", "service_role", "postgres"].includes(role))
         throw new Error("Invalid test role");
-      const client = await pool.connect();
+      const client = await sourcePool.connect();
       try {
         await client.query("begin");
         await client.query(`set local role ${role}`);
@@ -204,6 +204,69 @@ export async function startDatabase() {
       sql,
       file,
       cleanup,
+      withRestoredCopy: async (check) => {
+        const database = "audace_restore_" + randomBytes(8).toString("hex");
+        if (!/^audace_restore_[a-f0-9]{16}$/.test(database))
+          throw new Error("Unsafe restore target");
+        const dump = path.join(directory, "isolated-backup.dump");
+        const connection = [
+          "-h",
+          "127.0.0.1",
+          "-p",
+          String(port),
+          "-U",
+          "postgres",
+        ];
+        await run(
+          "pg_dump",
+          [
+            ...connection,
+            "-d",
+            "postgres",
+            "--format=custom",
+            "--schema=public",
+            "--schema=auth",
+            "--schema=audace_private",
+            "-f",
+            dump,
+          ],
+          { env },
+        );
+        await pool.query(
+          'create database "' + database + '" template template0',
+        );
+        await run(
+          "pg_restore",
+          [
+            ...connection,
+            "-d",
+            database,
+            "--exit-on-error",
+            "--no-owner",
+            "--clean",
+            "--if-exists",
+            dump,
+          ],
+          { env },
+        );
+        const restored = new pg.Pool({
+          host: "127.0.0.1",
+          port,
+          user: "postgres",
+          password,
+          database,
+          max: 2,
+          statement_timeout: 15000,
+        });
+        try {
+          return await check({
+            sql: (role, subject, text, values = []) =>
+              sql(role, subject, text, values, restored),
+          });
+        } finally {
+          await restored.end();
+        }
+      },
       reseed: () =>
         file(path.join(migrations, "20261107000400_locked_catalogue.sql")),
     };

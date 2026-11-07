@@ -14,6 +14,7 @@ AUDACE is set in a tracked text wordmark. Newsreader supplies the wordmark and d
 | Muted | `#67584e` | Supporting text on light surfaces |
 | Gold | `#866944` | Fine accents and active filter underline |
 | Line | `#d9cec0` | Dividers |
+| Control | `#8a7b6d` | Form and option boundaries; 4.02:1 against Paper, 3.76:1 against Ivory |
 | Burgundy | `#451c29` | Editorial detail panel and focus indicator |
 
 ## Layout

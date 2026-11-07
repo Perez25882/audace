@@ -8,6 +8,7 @@ import { regions } from "@/lib/shop-model";
 import { requireAdmin } from "@/lib/server/admin";
 import { withinLimit } from "@/lib/server/rate-limit";
 import { authClient, clearAdminCookies } from "@/lib/server/supabase";
+import { observe } from "@/lib/server/observe";
 
 function field(form: FormData, name: string, max: number, optional = false) {
   const input = form.get(name);
@@ -67,6 +68,7 @@ export async function signInAdmin(form: FormData) {
   } catch {
     // Credentials and provider errors stay out of application logs and user-facing responses.
   }
+  if (!signedIn) observe("admin_failed", { code: "action_rejected" });
   redirect(signedIn ? "/admin" : "/admin/login?result=denied");
 }
 
@@ -149,5 +151,6 @@ export async function saveAdmin(form: FormData) {
   } catch {
     result = "error";
   }
+  if (result !== "saved") observe("admin_failed", { code: "action_rejected" });
   redirect(`${target}?result=${result}`);
 }

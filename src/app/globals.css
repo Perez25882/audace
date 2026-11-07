@@ -9,6 +9,7 @@
   --color-muted: #67584e;
   --color-gold: #866944;
   --color-line: #d9cec0;
+  --color-control: #8a7b6d;
   --color-burgundy: #451c29;
   --font-sans: "Manrope Variable", Arial, sans-serif;
   --font-display: "Newsreader Variable", Georgia, serif;
@@ -248,7 +249,7 @@ button { cursor: pointer; }
 .variant-group h2 { display: flex; align-items: baseline; gap: 0.65rem; font-size: 0.82rem; font-weight: 750; margin-bottom: 0.55rem; }
 .variant-group h2 span { color: var(--color-muted); font-weight: 550; }
 .colour-options, .sleeve-options { display: flex; flex-wrap: wrap; gap: 0.55rem; }
-.colour-options a, .sleeve-options a { min-height: 2.75rem; display: flex; align-items: center; justify-content: center; border: 1px solid var(--color-line); }
+.colour-options a, .sleeve-options a { min-height: 2.75rem; display: flex; align-items: center; justify-content: center; border: 1px solid var(--color-control); }
 .colour-options a { min-width: 2.75rem; }
 .colour-options .swatch { width: 1.35rem; height: 1.35rem; }
 .sleeve-options a { padding-inline: 0.8rem; font-size: 0.78rem; }
@@ -382,7 +383,7 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   min-width: 2.75rem;
   min-height: 2.75rem;
   padding-inline: 0.65rem;
-  border: 1px solid var(--color-line);
+  border: 1px solid var(--color-control);
   font-size: 0.75rem;
 }
 .size-options input:checked + span { background: var(--color-sand); border-color: var(--color-espresso); }
@@ -460,7 +461,7 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   width: 100%;
   min-height: 2.75rem;
   padding: 0.55rem 0.65rem;
-  border: 1px solid var(--color-line);
+  border: 1px solid var(--color-control);
   background: var(--color-paper);
   color: var(--color-espresso);
   font-size: 1rem;
@@ -494,3 +495,12 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
 .confirmation-items h3 { font: 500 1.4rem/1.15 var(--font-display); }
 .confirmation-items p { color: var(--color-muted); }
 .confirmation-address { font-style: normal; overflow-wrap: anywhere; margin-bottom: 0.5rem; }
+
+.information-section { max-width: 65ch; margin-block: 2rem; }
+.site-footer :focus-visible { outline-color: var(--color-ivory); }
+.information-section h2 { font: 500 1.8rem/1.2 var(--font-display); margin-bottom: .75rem; }
+.information-section p { white-space: pre-line; overflow-wrap: anywhere; }
+.kicker { overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0s !important; animation-duration: 0s !important; }
+}

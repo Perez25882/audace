@@ -42,6 +42,13 @@ export default async function Confirmation({
   )
     return <PaymentStatus order={order} />;
 
+  const fulfilment =
+    order.fulfilment === "unfulfilled"
+      ? "awaiting fulfilment"
+      : order.fulfilment === "processing"
+        ? "being prepared"
+        : order.fulfilment;
+
   return (
     <section className="frame shop-page" aria-labelledby="confirmation-heading">
       <ConfirmedBag
@@ -57,7 +64,7 @@ export default async function Confirmation({
         Payment confirmed.
       </h1>
       <p className="shop-intro">
-        Thank you for choosing AUDACE. Your order is {order.fulfilment}.
+        Thank you for choosing AUDACE. Your order is {fulfilment}.
       </p>
       <div className="shop-layout">
         <div>
@@ -109,7 +116,7 @@ export default async function Confirmation({
               <dd>{formatGhs(order.amount)}</dd>
             </div>
           </dl>
-          <p>Fulfilment · {order.fulfilment}</p>
+          <p>Order status · {fulfilment}</p>
           <Link className="button button-solid" href="/#collection">
             Continue shopping
           </Link>

@@ -7,6 +7,7 @@ import { webhookEvidence } from "@/lib/payments/contracts";
 import { boundedBody, paymentResponse } from "@/lib/server/payment-http";
 import { rpc } from "@/lib/server/payment-service";
 import { paymentConfig } from "@/lib/server/paystack";
+import { observe } from "@/lib/server/observe";
 
 export const runtime = "nodejs";
 
@@ -31,12 +32,15 @@ export async function POST(request: Request) {
           now: Math.floor(Date.now() / 1000),
         },
       )
-    )
+    ) {
+      observe("webhook_rejected", { code: "invalid_signature" });
       return paymentResponse({ error: "Invalid signature." }, 401);
+    }
     let event;
     try {
       event = webhookEvidence(parseProviderJson(raw.toString("utf8")));
     } catch {
+      observe("webhook_rejected", { code: "invalid_event" });
       return paymentResponse({ error: "Unsupported or malformed event." }, 400);
     }
     await rpc("audace_payment_record_event", {
@@ -48,6 +52,7 @@ export async function POST(request: Request) {
     });
     return paymentResponse({ received: true });
   } catch {
+    observe("webhook_record_failed", { code: "receipt_unavailable" });
     return paymentResponse({ error: "Event could not be recorded." }, 503);
   }
 }

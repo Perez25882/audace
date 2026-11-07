@@ -132,6 +132,24 @@ test(
           await page
             .getByRole("button", { name: "Continue to Paystack" })
             .waitFor();
+          if (viewport.width === 1440) {
+            for (const width of [
+              320, 360, 375, 390, 414, 768, 1024, 1440, 1920,
+            ]) {
+              await page.setViewportSize({ width, height: 1000 });
+              assert.equal(
+                await page.evaluate(() => document.documentElement.scrollWidth),
+                width,
+              );
+              const paymentButton = page.getByRole("button", {
+                name: "Continue to Paystack",
+              });
+              await paymentButton.scrollIntoViewIfNeeded();
+              const box = await paymentButton.boundingBox();
+              assert.ok(box && box.height >= 44 && box.width <= width);
+            }
+            await page.setViewportSize(viewport);
+          }
           await page
             .getByRole("button", { name: "Continue to Paystack" })
             .click();
@@ -218,6 +236,15 @@ test(
         2,
       );
       await withPage(browser, screenSizes[0], async (page) => {
+        assert.equal(
+          (await fetch(origin + "/api/internal/health")).status,
+          401,
+        );
+        const health = await fetch(origin + "/api/internal/health", {
+          headers: { authorization: "Bearer " + fixtureWorker },
+        });
+        assert.equal(health.status, 200);
+        assert.equal((await health.json()).workerRecent, true);
         await page.goto(origin + "/admin/login");
         await page.getByLabel("Email address").fill("owner@example.test");
         await page

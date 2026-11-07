@@ -3,6 +3,7 @@ import "server-only";
 import { NextResponse } from "next/server";
 import { parseProviderJson } from "@/lib/payments/security";
 import { paymentConfig } from "./paystack";
+import { observe } from "./observe";
 
 export async function boundedBody(request: Request, maximum: number) {
   const reader = request.body?.getReader();
@@ -48,6 +49,7 @@ export function paymentResponse(value: unknown, status = 200) {
 }
 
 export function paymentError(error: unknown) {
+  observe("payment_retry", { code: "checkout_rejected" });
   const code = error instanceof Error ? error.message : "";
   if (
     error instanceof SyntaxError ||

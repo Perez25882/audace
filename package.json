@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=22"
+    "node": ">=22.23.4 <23"
   },
   "scripts": {
     "dev": "next dev",
@@ -11,9 +11,12 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "tsc -p tests/tsconfig.json && node --test work/test-build/tests/shop.test.js work/test-build/tests/payments.test.js",
+    "test": "tsc -p tests/tsconfig.json && node --test work/test-build/tests/shop.test.js work/test-build/tests/payments.test.js work/test-build/tests/release.test.js",
     "test:e2e": "node --test --test-concurrency=1 tests/shop.browser.test.mjs tests/payment.browser.test.mjs",
-    "test:db": "node --test tests/database.test.mjs tests/payments.database.test.mjs"
+    "test:db": "node --test --test-concurrency=1 tests/database.test.mjs tests/payments.database.test.mjs tests/release.database.test.mjs",
+    "test:qa": "node --test --test-concurrency=1 tests/release.browser.test.mjs",
+    "test:perf": "node scripts/performance.mjs",
+    "verify": "node scripts/verify.mjs"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "5.3.0",
@@ -29,8 +32,11 @@
     "@types/node": "20.19.43",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "axe-core": "4.14.0",
+    "chrome-launcher": "1.2.3",
     "eslint": "9.39.5",
     "eslint-config-next": "16.4.5",
+    "lighthouse": "13.6.0",
     "pg": "8.23.1",
     "playwright-core": "1.65.0",
     "postcss": "8.5.32",

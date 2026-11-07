@@ -1,0 +1,157 @@
+{
+  "measuredAt": "2026-11-07T21:26:01.296Z",
+  "buildId": "NA3s1vuoYGAI44mQLTh_e",
+  "node": "v22.23.4",
+  "lighthouse": "13.6.0",
+  "hostUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+  "condition": "Local production build; unconfigured illustrative catalogue; Lighthouse simulated mobile throttling; not real-user/device measurements. TBT is not INP.",
+  "viewport": {
+    "mobile": true,
+    "width": 390,
+    "height": 844,
+    "deviceScaleFactor": 1,
+    "disabled": false
+  },
+  "throttlingMethod": "simulate",
+  "throttling": {
+    "rttMs": 150,
+    "throughputKbps": 1638.4,
+    "requestLatencyMs": 562.5,
+    "downloadThroughputKbps": 1474.5600000000002,
+    "uploadThroughputKbps": 675,
+    "cpuSlowdownMultiplier": 4
+  },
+  "summaries": [
+    {
+      "route": "/",
+      "medianPerformance": 93,
+      "medianLcpMs": 1178,
+      "minLcpMs": 951,
+      "maxLcpMs": 2070,
+      "maxCls": 0.0007748961983296271,
+      "medianTbtMs": 326,
+      "medianTransferBytes": 316976,
+      "accessibilityScores": [
+        1,
+        1,
+        1
+      ],
+      "seoScores": [
+        0.66,
+        0.66,
+        0.66
+      ]
+    },
+    {
+      "route": "/products/burgundy-short-sleeve",
+      "medianPerformance": 92,
+      "medianLcpMs": 2023,
+      "minLcpMs": 940,
+      "maxLcpMs": 2728,
+      "maxCls": 0.0002611307311617278,
+      "medianTbtMs": 340,
+      "medianTransferBytes": 268461,
+      "accessibilityScores": [
+        1,
+        1,
+        1
+      ],
+      "seoScores": [
+        0.66,
+        0.66,
+        0.66
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "route": "/",
+      "run": 1,
+      "performance": 0.93,
+      "lcpMs": 2070.1614,
+      "cls": 0.0007748961983296271,
+      "tbtMs": 281.5000000000001,
+      "transferBytes": 316721,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 0.66
+    },
+    {
+      "route": "/",
+      "run": 2,
+      "performance": 0.91,
+      "lcpMs": 951.2542999999998,
+      "cls": 0.0007748961983296271,
+      "tbtMs": 367.0000000000001,
+      "transferBytes": 317267,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 0.66
+    },
+    {
+      "route": "/",
+      "run": 3,
+      "performance": 0.93,
+      "lcpMs": 1177.9313,
+      "cls": 0.0007748961983296271,
+      "tbtMs": 326.0000000000001,
+      "transferBytes": 316976,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 0.66
+    },
+    {
+      "route": "/products/burgundy-short-sleeve",
+      "run": 1,
+      "performance": 0.85,
+      "lcpMs": 2728.0447,
+      "cls": 0,
+      "tbtMs": 347.47765000000004,
+      "transferBytes": 268461,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 0.66
+    },
+    {
+      "route": "/products/burgundy-short-sleeve",
+      "run": 2,
+      "performance": 0.92,
+      "lcpMs": 2023.4140000000004,
+      "cls": 0,
+      "tbtMs": 334.5000000000001,
+      "transferBytes": 268469,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 0.66
+    },
+    {
+      "route": "/products/burgundy-short-sleeve",
+      "run": 3,
+      "performance": 0.92,
+      "lcpMs": 940.2735,
+      "cls": 0.0002611307311617278,
+      "tbtMs": 340.4316249999997,
+      "transferBytes": 267890,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 0.66
+    }
+  ],
+  "interaction": {
+    "condition": "Chromium 390x844; 4x CDP CPU throttling; a few lab interactions only, not field INP",
+    "interactions": [
+      {
+        "route": "/",
+        "samples": 9,
+        "maxReportedEventMs": 64,
+        "reportingThresholdMs": 16
+      },
+      {
+        "route": "/products/burgundy-short-sleeve",
+        "samples": 6,
+        "maxReportedEventMs": 88,
+        "reportingThresholdMs": 16
+      }
+    ]
+  }
+}

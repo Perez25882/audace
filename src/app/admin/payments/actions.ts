@@ -5,6 +5,7 @@ import { uuidPattern } from "@/lib/checkout-input";
 import { parseGhs } from "@/lib/bag";
 import { requireAdmin } from "@/lib/server/admin";
 import { runPaymentJobs } from "@/lib/server/payment-service";
+import { observe } from "@/lib/server/observe";
 
 function text(form: FormData, key: string, max: number) {
   const value = form.get(key);
@@ -34,6 +35,7 @@ export async function reverifyPayment(form: FormData) {
   } catch {
     /* The queued verification remains durable during provider failures. */
   }
+  if (result === "error") observe("admin_failed", { code: "action_rejected" });
   redirect(`/admin/payments?result=${result}`);
 }
 
@@ -52,6 +54,7 @@ export async function resolveInventory(form: FormData) {
   } catch {
     /* Database validation and role checks determine whether the operation commits. */
   }
+  if (result === "error") observe("admin_failed", { code: "action_rejected" });
   redirect(
     uuidPattern.test(order)
       ? `/admin/orders/${order}?result=${result}`
@@ -79,6 +82,7 @@ export async function requestRefundReview(form: FormData) {
   } catch {
     /* A request cannot exceed the verified payment or bypass the owner role. */
   }
+  if (result === "error") observe("admin_failed", { code: "action_rejected" });
   redirect(
     uuidPattern.test(order)
       ? `/admin/orders/${order}?result=${result}`
